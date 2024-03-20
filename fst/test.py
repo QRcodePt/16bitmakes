@@ -8,20 +8,12 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.floatlayout import FloatLayout
 from kivymd.uix.dialog import MDDialog
 from kivy.uix.relativelayout import RelativeLayout
-from flask import Flask, jsonify, request
 from pyzbar.pyzbar import decode
-from kivy.clock import Clock
 from kivy.graphics.texture import Texture
-from kivy.uix.image import Image
 import cv2
-import sqlite3
 
 x = ""
 screen_width, screen_height = (400, 100)
-
-app = Flask(__name__)
-DATABASE = 'DB_workhour.db'
-
 
 class LoginScreen(Screen):
     def __init__(self, **kwargs):
@@ -53,10 +45,6 @@ class LoginScreen(Screen):
 
         self.add_widget(layout)
 
-    def get_db_connection(self):
-        conn = sqlite3.connect(DATABASE)
-        return conn
-
     def check_login(self, instance):
         login_input = self.children[0].children[3]
         password_input = self.children[0].children[1]
@@ -66,7 +54,7 @@ class LoginScreen(Screen):
         password = password_input.text
         print(password)
 
-        url = 'http://127.0.0.1:5000/employees'  # Flask API endpoint
+        url = 'http://127.0.0.1:5000/employees'
         data = {'login': login, 'password': password}
 
         response = requests.post(url, json=data)
