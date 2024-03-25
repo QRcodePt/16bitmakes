@@ -1,4 +1,7 @@
+import re
+
 import requests
+from kivy.clock import Clock
 from kivy.uix.camera import Camera
 from kivymd.app import MDApp
 from kivymd.uix.button import MDRectangleFlatButton
@@ -60,10 +63,12 @@ class LoginScreen(Screen):
         response = requests.post(url, json=data)
 
         user = response.json()
-        print(user)
+        string = str(user)
+        string = re.sub(r'\W', ' ', string)
+        string = string[2:]
 
         if user:
-            self.open_next_screen(instance)
+            self.open_next_screen(instance, string)
             print('activate')
         else:
             self.show_invalid_password_popup()
@@ -73,19 +78,23 @@ class LoginScreen(Screen):
         dialog = MDDialog(title="Ошибка", text="Неправильный логин/пароль, попробуйте снова.", size_hint=(0.8, 0.3))
         dialog.open()
 
-    def open_next_screen(self, instance):
+    def open_next_screen(self, instance, string):
+        next_screen = NextScreen(string_value=string)
         self.manager.current = 'NextScreen'
 
+
 class NextScreen(Screen):
-    def __init__(self, **kwargs):
+    def __init__(self, string_value="", **kwargs):
         super(NextScreen, self).__init__(**kwargs)
         layout = FloatLayout()
+        self.string_value = string_value
+        print(self.string_value)
 
-        fio_label = MDLabel(text=x, halign="center")
-        fio_label_pos_x = screen_width / 2 - len(x)*10 / 2
+        self.fio_label = MDLabel(text=self.string_value, halign="center")
+        fio_label_pos_x = screen_width / 2 - len(self.string_value) * 10 / 2
         fio_label_pos_y = screen_height / 2 + screen_height / 3
-        fio_label.pos = (fio_label_pos_x, fio_label_pos_y)
-        layout.add_widget(fio_label)
+        self.fio_label.pos = (fio_label_pos_x, fio_label_pos_y)
+        layout.add_widget(self.fio_label)
 
         button1 = MDRectangleFlatButton(text='Открыть смену', pos_hint={"center_x": 0.3, "center_y": 0.2})
         button1.bind(on_press=self.open_qr_screen)
